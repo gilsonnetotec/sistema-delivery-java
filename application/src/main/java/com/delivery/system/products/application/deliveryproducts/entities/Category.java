@@ -1,13 +1,29 @@
 package com.delivery.system.products.application.deliveryproducts.entities;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import org.springframework.lang.NonNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Entity
+@Table(name = "categories")
 public class Category implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NonNull
+    @Column(length = 200, nullable = true)
     private String name;
+
 
     public Category(){
 
@@ -33,6 +49,7 @@ public class Category implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
 
     @Override
     public boolean equals(Object o) {
