@@ -1,13 +1,9 @@
 package com.delivery.system.products.application.deliveryproducts.entities;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import org.springframework.lang.NonNull;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -18,10 +14,12 @@ public class Category implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Código de identificação")
     private Long id;
 
-    @NonNull
     @Column(length = 200, nullable = true)
+    @Schema(description = "Nome da categoria")
+    @NotNull(message = "Informar o name da categoria")
     private String name;
 
 

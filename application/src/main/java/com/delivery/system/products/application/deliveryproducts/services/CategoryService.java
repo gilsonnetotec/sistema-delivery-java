@@ -3,6 +3,7 @@ package com.delivery.system.products.application.deliveryproducts.services;
 import com.delivery.system.products.application.deliveryproducts.dto.CategoryDTO;
 import com.delivery.system.products.application.deliveryproducts.entities.Category;
 import com.delivery.system.products.application.deliveryproducts.repositories.CategoryRepository;
+import com.delivery.system.products.application.deliveryproducts.rules.CategoryRule;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.DatabaseException;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +38,8 @@ public class CategoryService{
     @Transactional
     public CategoryDTO insert(CategoryDTO dto){
         try{
+            Boolean rule = new CategoryRule(repository).saved(dto);
+
             Category entity = new Category();
 
             entity.setId(dto.getId());
@@ -56,6 +59,9 @@ public class CategoryService{
     @Transactional
     public CategoryDTO update(final Long id, CategoryDTO dto){
         try {
+
+            Boolean rule = new CategoryRule(repository).updated(dto);
+
             Category entity = repository.getOne(id);
 
             entity.setName(dto.getName());
