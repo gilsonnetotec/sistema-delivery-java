@@ -34,20 +34,20 @@ public class CategoryRule {
         private CategoryRepository repository;
 
 
-        public Handler(CategoryDTO dto, CategoryRepository repository) {
+        protected Handler(CategoryDTO dto, CategoryRepository repository) {
             this.repository = repository;
             checkNomeIsNull(dto);
             checkNomeExist(dto);
         }
 
-        public void checkNomeIsNull(CategoryDTO dto){
+       protected void checkNomeIsNull(CategoryDTO dto){
             if(dto.getName() == null || dto.getName() == ""){
                 valid = false;
                 throw new ResourceNotFoundException("Nome não pode ser nullo ou vazio");
             }
         }
 
-        public void checkNomeExist(CategoryDTO dto){
+        protected void checkNomeExist(CategoryDTO dto){
             boolean result = repository.existsByName(dto.getName());
             if(result){
                 valid = false;

@@ -39,8 +39,8 @@ public class CategoryRulesTest {
     }
 
     @Test
-    public void checkNomeExistShouldReturnExceptionWhenNomeNotExist(){
-        dto.setName("Nome não exist");
+    public void checkNomeExistShouldReturnExceptionWhenNomeExist(){
+        dto.setName("foods");
         Mockito.when(repository.existsByName(dto.getName())).thenThrow(ResourceNotFoundException.class);
         Mockito.doThrow(new ResourceNotFoundException("Este nome já existe na tabela")).when(handler).checkNomeExist(dto);
     }
