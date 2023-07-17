@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class CategoryRule {
     private final CategoryRepository repository;
+    private Boolean valid = true;
 
     @Autowired
     public CategoryRule(CategoryRepository repository) {
@@ -23,6 +24,10 @@ public class CategoryRule {
         return true;
     }
 
+    public Boolean biuld(){
+        return valid;
+    }
+
 
     public class Handler{
         @Autowired
@@ -35,15 +40,17 @@ public class CategoryRule {
             checkNomeExist(dto);
         }
 
-        private void checkNomeIsNull(CategoryDTO dto){
+        public void checkNomeIsNull(CategoryDTO dto){
             if(dto.getName() == null || dto.getName() == ""){
+                valid = false;
                 throw new ResourceNotFoundException("Nome não pode ser nullo ou vazio");
             }
         }
 
-        private void checkNomeExist(CategoryDTO dto){
+        public void checkNomeExist(CategoryDTO dto){
             boolean result = repository.existsByName(dto.getName());
             if(result){
+                valid = false;
                 throw new ResourceNotFoundException("Este nome já existe na tabela");
             }
         }
