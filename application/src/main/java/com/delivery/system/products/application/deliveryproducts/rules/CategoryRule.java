@@ -7,32 +7,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class CategoryRule {
     private final CategoryRepository repository;
-    private Boolean valid = true;
+    private static Boolean valid = true;
 
     @Autowired
     public CategoryRule(CategoryRepository repository) {
         this.repository = repository;
     }
 
-    public Boolean saved(CategoryDTO dto){
+    public CategoryRule saved(CategoryDTO dto){
         Handler handler = new Handler(dto, repository);
-        return true;
+        return this;
     }
 
-    public Boolean updated(CategoryDTO dto){
+    public CategoryRule updated(CategoryDTO dto){
         Handler handler = new Handler(dto, repository);
-        return true;
+        return this;
     }
 
-    public Boolean biuld(){
+    public static Boolean build(){
+        return getValid();
+    }
+
+    public static Boolean getValid() {
         return valid;
     }
 
+    public static void setValid(Boolean valid) {
+        CategoryRule.valid = valid;
+    }
 
     public class Handler{
         @Autowired
         private CategoryRepository repository;
-
 
         protected Handler(CategoryDTO dto, CategoryRepository repository) {
             this.repository = repository;
@@ -40,19 +46,25 @@ public class CategoryRule {
             checkNomeExist(dto);
         }
 
-       protected void checkNomeIsNull(CategoryDTO dto){
+       protected Handler checkNomeIsNull(CategoryDTO dto){
             if(dto.getName() == null || dto.getName() == ""){
-                valid = false;
+                setValid(false);
                 throw new ResourceNotFoundException("Nome não pode ser nullo ou vazio");
             }
+            return this;
         }
 
-        protected void checkNomeExist(CategoryDTO dto){
+        protected Handler checkNomeExist(CategoryDTO dto){
             boolean result = repository.existsByName(dto.getName());
             if(result){
-                valid = false;
+                setValid(false);
                 throw new ResourceNotFoundException("Este nome já existe na tabela");
             }
+            return this;
+        }
+
+        public static Boolean validHandler(){
+            return getValid();
         }
     }
 }

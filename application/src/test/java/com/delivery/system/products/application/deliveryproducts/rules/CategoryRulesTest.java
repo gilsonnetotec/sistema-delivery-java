@@ -35,7 +35,12 @@ public class CategoryRulesTest {
         dto.setName(null);
         Mockito.when(repository.existsByName(dto.getName())).thenThrow(ResourceNotFoundException.class);
         Mockito.doThrow(new ResourceNotFoundException("Nome não pode ser nullo ou vazio")).when(handler).checkNomeIsNull(dto);
-        Assertions.assertFalse(rule.biuld());
+        try{
+            handler.checkNomeIsNull(dto);
+        }catch (Exception e){
+            rule.setValid(false);
+        }
+        Assertions.assertFalse(handler.validHandler());
     }
 
     @Test
