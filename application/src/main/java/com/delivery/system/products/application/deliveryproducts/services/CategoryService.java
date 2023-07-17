@@ -38,7 +38,7 @@ public class CategoryService{
     @Transactional
     public CategoryDTO insert(CategoryDTO dto){
         try{
-            Boolean rule = new CategoryRule(repository).saved(dto);
+            Boolean rule = new CategoryRule(repository).saved(dto).build();
 
             Category entity = new Category();
 
@@ -60,7 +60,7 @@ public class CategoryService{
     public CategoryDTO update(final Long id, CategoryDTO dto){
         try {
 
-            Boolean rule = new CategoryRule(repository).updated(dto);
+            Boolean rule = new CategoryRule(repository).updated(dto).build();
 
             Category entity = repository.getOne(id);
 
