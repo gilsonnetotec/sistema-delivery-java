@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "tb_category")
 public class Category implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +17,7 @@ public class Category implements Serializable {
     @Schema(description = "Código de identificação")
     private Long id;
 
-    @Column(length = 200, nullable = true)
+    @Column(length = 20, nullable = true)
     @Schema(description = "Nome da categoria")
     @NotNull(message = "Informar o name da categoria")
     private String name;
