@@ -34,11 +34,10 @@ public class ProductResource {
             @RequestParam(value = "linesPerPage", defaultValue = "10") Integer linesPerPage,
             @RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction,
-            @RequestParam(value = "categoryId" /*,defaultValue = "1"*/) String categoryId
+            @RequestParam(value = "categoryId" /*,defaultValue = "1"*/) String categoryIds
     ){
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-
-        Page<ProductDTO> list = service.findAll(pageRequest, categoryId);
+        Page<ProductDTO> list = service.findAll(pageRequest, categoryIds);
         return ResponseEntity.ok().body(list);
     }
 

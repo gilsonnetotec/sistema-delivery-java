@@ -26,8 +26,8 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAll(PageRequest pageRequest, String category){
-        Set<Category> categories = convertCategoryIdsToSet(category);
+    public Page<ProductDTO> findAll(PageRequest pageRequest, String categoryIds){
+        Set<Category> categories = convertCategoryIdsToSet(categoryIds);
         Page<Product> page = repository.findByCategoriesIn(categories,pageRequest);
         return page.map(product -> new ProductDTO(product));
     }
