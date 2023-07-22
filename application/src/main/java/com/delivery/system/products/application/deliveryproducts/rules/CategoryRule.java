@@ -4,7 +4,9 @@ import com.delivery.system.products.application.deliveryproducts.dto.CategoryDTO
 import com.delivery.system.products.application.deliveryproducts.repositories.CategoryRepository;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CategoryRule {
     private final CategoryRepository repository;
     private static Boolean valid = true;
