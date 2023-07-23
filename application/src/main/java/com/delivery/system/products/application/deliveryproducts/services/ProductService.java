@@ -6,6 +6,7 @@ import com.delivery.system.products.application.deliveryproducts.entities.Catego
 import com.delivery.system.products.application.deliveryproducts.entities.Product;
 import com.delivery.system.products.application.deliveryproducts.repositories.CategoryRepository;
 import com.delivery.system.products.application.deliveryproducts.repositories.ProductRepository;
+import com.delivery.system.products.application.deliveryproducts.rules.ProductRule;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.DatabaseException;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
@@ -48,6 +49,8 @@ public class ProductService {
     public ProductDTO insert(ProductDTO dto){
         try{
 
+            Boolean rule = new ProductRule(repository).saved(dto).build();
+
             Product entity = new Product();
 
             copyDtoToEntity(dto, entity);
@@ -66,6 +69,9 @@ public class ProductService {
     @Transactional
     public ProductDTO update(final Long id, ProductDTO dto){
         try{
+
+            Boolean rule = new ProductRule(repository).updated(dto).build();
+
            Product entity = repository.getOne(id);
 
             copyDtoToEntity(dto,entity);
@@ -74,6 +80,22 @@ public class ProductService {
 
         }catch (Exception e){
             throw new ResourceNotFoundException("Id "+id+" não encontrado");
+        }
+    }
+
+    @Transactional
+    public  void delete(Long id){
+        try {
+            Boolean result = repository.existsById(id);
+            if(!result){
+                throw new ResourceNotFoundException("Id "+id+" não encontrado");
+            }
+            repository.deleteById(id);
+        }catch (EmptyResultDataAccessException e){
+            throw new ResourceNotFoundException("Id "+id+" não encontrado");
+        }
+        catch (DataIntegrityViolationException e){
+            throw new DatabaseException("Violação de integridade");
         }
     }
 
@@ -99,24 +121,12 @@ public class ProductService {
         entity.getCategories().clear();
 
         for(CategoryDTO catDto : dto.getCategories()){
+            boolean result = categoryRepository.existsById(catDto.getId());
+            if(!result){
+                throw new ResourceNotFoundException("Id "+catDto.getId()+" da categoria não encontrado");
+            }
             Category category = categoryRepository.getOne(catDto.getId());
             entity.getCategories().add(category);
-        }
-    }
-
-    @Transactional
-    public  void delete(Long id){
-        try {
-            Boolean result = repository.existsById(id);
-            if(!result){
-                throw new ResourceNotFoundException("Id "+id+" não encontrado");
-            }
-            repository.deleteById(id);
-        }catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException("Id "+id+" não encontrado");
-        }
-        catch (DataIntegrityViolationException e){
-            throw new DatabaseException("Violação de integridade");
         }
     }
 
