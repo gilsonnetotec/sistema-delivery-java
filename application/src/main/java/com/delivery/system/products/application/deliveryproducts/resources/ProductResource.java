@@ -15,6 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/produtos")
@@ -51,5 +54,41 @@ public class ProductResource {
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id){
         ProductDTO dto = service.findById(id);
         return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(description = "API para criar um produto")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Retorno OK da criação"),
+            @ApiResponse(responseCode = "401", description = "Erro de autenticação dessa API"),
+            @ApiResponse(responseCode = "403", description = "Erro de autorização dessa API"),
+            @ApiResponse(responseCode = "404", description = "Recurso não encontrado"),})
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductDTO> insert(@RequestBody ProductDTO dto){
+        dto = service.insert(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
+        return ResponseEntity.created(uri).body(dto);
+    }
+
+    @Operation(description = "API para atualizar um produto por id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Retorno OK da remoção"),
+            @ApiResponse(responseCode = "401", description = "Erro de autenticação dessa API"),
+            @ApiResponse(responseCode = "403", description = "Erro de autorização dessa API"),
+            @ApiResponse(responseCode = "404", description = "Recurso não encontrado"),})
+    @Parameters(value = {@Parameter(name = "id", in = ParameterIn.PATH)})
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO dto){
+        dto = service.update(id, dto);
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(description = "API para remover um produto por id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Retorno OK da atualização"),
+            @ApiResponse(responseCode = "401", description = "Erro de autenticação dessa API"),
+            @ApiResponse(responseCode = "403", description = "Erro de autorização dessa API"),
+            @ApiResponse(responseCode = "404", description = "Recurso não encontrado"),})
+    @Parameters(value = {@Parameter(name = "id", in = ParameterIn.PATH)})
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductDTO> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
