@@ -1,0 +1,11 @@
+services:
+  postgres-delivery:
+    image: postgres:12.4
+    volumes:
+     - ./delivery.bkp:/docker-entrypoint-initdb.d/delivery.sql
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: delivery
+    ports:
+      - "5432:5432"
