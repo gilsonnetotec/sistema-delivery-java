@@ -74,12 +74,13 @@ public class ProductService {
 
            Product entity = repository.getOne(id);
 
-            copyDtoToEntity(dto,entity);
+           copyDtoToEntity(dto,entity);
 
-            return  new ProductDTO(entity, entity.getCategories());
+           return  new ProductDTO(entity, entity.getCategories());
 
         }catch (Exception e){
-            throw new ResourceNotFoundException("Id "+id+" não encontrado");
+            throw new ResourceNotFoundException(""+e);
+            //throw new ResourceNotFoundException("Id "+id+" não encontrado");
         }
     }
 
@@ -126,7 +127,12 @@ public class ProductService {
                 throw new ResourceNotFoundException("Id "+catDto.getId()+" da categoria não encontrado");
             }
             Category category = categoryRepository.getOne(catDto.getId());
-            entity.getCategories().add(category);
+            if(category != null){
+                entity.getCategories().add(category);
+            }else{
+                category = new Category();
+                entity.getCategories().add(category);
+            }
         }
     }
 

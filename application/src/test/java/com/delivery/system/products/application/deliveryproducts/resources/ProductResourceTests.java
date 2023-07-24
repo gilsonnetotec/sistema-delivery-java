@@ -1,56 +1,80 @@
 package com.delivery.system.products.application.deliveryproducts.resources;
 
 import com.delivery.system.products.application.deliveryproducts.Factory;
-import com.delivery.system.products.application.deliveryproducts.dto.CategoryDTO;
+import com.delivery.system.products.application.deliveryproducts.dto.ProductDTO;
 import com.delivery.system.products.application.deliveryproducts.entities.Category;
+import com.delivery.system.products.application.deliveryproducts.entities.Product;
 import com.delivery.system.products.application.deliveryproducts.repositories.CategoryRepository;
+import com.delivery.system.products.application.deliveryproducts.repositories.ProductRepository;
 import com.delivery.system.products.application.deliveryproducts.services.CategoryService;
+import com.delivery.system.products.application.deliveryproducts.services.ProductService;
 import com.delivery.system.products.application.deliveryproducts.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-public class CategoryResourceTests {
+@ExtendWith(MockitoExtension.class)
+public class ProductResourceTests {
 
     @Mock
-    private CategoryRepository repository;
+    private ProductRepository repository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
 
     @InjectMocks
-    private CategoryService service;
+    private ProductService service;
 
-    private Category entity;
+    @InjectMocks
+    private CategoryService categoryService;
 
-    private CategoryDTO dto;
+    private Product entity;
+
+    private ProductDTO dto;
+
+    private Category category;
+
+    private Set<Category> categories;
 
     private long existingId = 1L;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        entity = Factory.createCategory();
-        dto = Factory.createdCategoryDTO();
+        entity = Factory.createProduct();
+        dto = Factory.createdProductDTO();
+        category = Factory.createCategory();
+
+        categories = new HashSet<>();
+        categories.add(new Category(category.getId(), category.getName()));
+        categoryRepository.findById(1L).ifPresent(categories::add);
     }
 
     @Test
     public void getAllShouldReturnPageWithOneEntity(){
+
+        categoryRepository.findById(1L).ifPresent(categories::add);
+
         PageRequest pageRequest = PageRequest.of(0, 10);
 
-        List<Category> entityList = Arrays.asList(entity);
+        List<Product> entityList = Arrays.asList(entity);
 
-        Page<Category> page = new PageImpl<>(entityList, pageRequest, 1);
+        Page<Product> page = new PageImpl<>(entityList, pageRequest, 1);
 
-        Mockito.when(repository.findAll(pageRequest)).thenReturn(page);
+        Mockito.when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
-        Page<CategoryDTO> resultPage = service.findAll(pageRequest);
+        Mockito.when(repository.findByCategoriesIn(categories,pageRequest)).thenReturn(page);
+
+        Page<ProductDTO> resultPage = service.findAll(pageRequest, "1");
 
         Assertions.assertEquals(1, resultPage.getTotalElements());// Verifica se a página contém exatamente uma entidade
         Assertions.assertEquals(entity.getId(), resultPage.getContent().get(0).getId());
@@ -62,15 +86,15 @@ public class CategoryResourceTests {
     public void getShouldReturnEntityWhenSearchForOneId() {
         Mockito.when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
-        CategoryDTO result = service.findById(entity.getId());
+        ProductDTO result = service.findById(entity.getId());
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(existingId, result.getId());
-        Assertions.assertEquals("Teste de Categoria", result.getName());
+        Assertions.assertEquals("Teste de Produto", result.getName());
     }
 
     @Test
-    public void getShouldNotReturnEntityWhenCategory_NotFound(){
+    public void getShouldNotReturnEntityWhenProduct_NotFound(){
         Mockito.when(repository.findById(1L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, ()-> service.findById(existingId));
@@ -84,8 +108,9 @@ public class CategoryResourceTests {
         dto.setId(null);
 
         Mockito.when(repository.save(entity)).thenReturn(entity);
+        Mockito.when(categoryRepository.existsById(category.getId())).thenReturn(true);
 
-        CategoryDTO result = service.insert(dto);
+        ProductDTO result = service.insert(dto);
 
         Assertions.assertEquals(entity.getId(), result.getId());
         Assertions.assertEquals(entity.getName(), result.getName());
@@ -96,22 +121,30 @@ public class CategoryResourceTests {
 
     @Test
     public void updateShouldPersistWithAutoincrementWhenHasId(){
-
         Mockito.when(repository.getOne(existingId)).thenReturn(entity);
-        Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(entity);
+        Mockito.lenient().when(repository.save(ArgumentMatchers.any())).thenReturn(entity);
+        Mockito.when(categoryRepository.existsById(category.getId())).thenReturn(true);
 
-        dto.setName("Nova Categoria");
 
-        CategoryDTO result = service.update(existingId, dto);
+        Assertions.assertNotNull(dto.getCategories());
+        dto.getCategories().forEach(c -> {
+            Assertions.assertNotNull(c.getId());
+            Assertions.assertNotNull(c.getName());
+        });
 
-        Assertions.assertEquals("Nova Categoria", result.getName());
+        Assertions.assertNotNull(category);
+
+        dto.setName("Novo Produto");
+
+        ProductDTO result = service.update(existingId, dto);
+
+        Assertions.assertEquals("Novo Produto", result.getName());
         Mockito.verify(repository, Mockito.times(1)).getOne(1L);
-        Mockito.verify(repository, Mockito.times(1)).save(ArgumentMatchers.any());
-
+        Mockito.lenient().when(repository.save(ArgumentMatchers.any())).thenReturn(entity);
     }
 
     @Test
-    public void updateShouldNotPersistWhenCategory_NotFound(){
+    public void updateShouldNotPersistWhenProduct_NotFound(){
         Mockito.when(repository.getOne(existingId)).thenThrow(EntityNotFoundException.class);
 
         dto.setName("Nova Categoria");

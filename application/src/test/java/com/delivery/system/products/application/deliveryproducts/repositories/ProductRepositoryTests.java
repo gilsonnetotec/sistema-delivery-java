@@ -1,7 +1,7 @@
 package com.delivery.system.products.application.deliveryproducts.repositories;
 
 import com.delivery.system.products.application.deliveryproducts.Factory;
-import com.delivery.system.products.application.deliveryproducts.entities.Category;
+import com.delivery.system.products.application.deliveryproducts.entities.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +13,16 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CategoryRepositoryTests {
+public class ProductRepositoryTests {
 
     @Autowired
-    private CategoryRepository repository;
+    private ProductRepository repository;
 
     private long existingId = 1L;
 
     @Test
     public void getAllShouldGeAllObjectsExists(){
-       List<Category> result = repository.findAll();
+       List<Product> result = repository.findAll();
 
         Assertions.assertNotNull(result);
         Assertions.assertFalse(result.isEmpty());
@@ -31,13 +31,13 @@ public class CategoryRepositoryTests {
     @Test
     public void getByIdShouldGetObjectWhenIdExists(){
 
-        Category entity = Factory.createCategory();
+        Product entity = Factory.createProduct();
 
-        Category savedDomain = repository.save(entity);
+        Product savedDomain = repository.save(entity);
 
         Long id = savedDomain.getId();
 
-        Category result = repository.findById(id).orElse(null);
+        Product result = repository.findById(id).orElse(null);
 
        Assertions.assertNotNull(result);
 
@@ -48,11 +48,11 @@ public class CategoryRepositoryTests {
     @Test
     public void createShouldCreatedObject(){
 
-        Category entity = new Category();
+        Product entity = new Product();
 
         entity.setName("Test Entity");
 
-        Category result = repository.save(entity);
+        Product result = repository.save(entity);
 
         Assertions.assertNotNull(result.getId());
 
@@ -65,19 +65,19 @@ public class CategoryRepositoryTests {
 
         repository.deleteById(existingId);
 
-        Optional<Category> result = repository.findById(existingId);
+        Optional<Product> result = repository.findById(existingId);
 
         Assertions.assertFalse(result.isPresent());
     }
 
     @Test
     public void saveShouldPersistWithAutoincrementWhenIdisNull(){
-        Category category = Factory.createCategory();
-        category.setId(null);
+        Product product = Factory.createProduct();
+        product.setId(null);
 
-        category = repository.save(category);
+        product = repository.save(product);
 
-        Assertions.assertNotNull(category.getId());
+        Assertions.assertNotNull(product.getId());
     }
 
 
